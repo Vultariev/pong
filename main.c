@@ -41,11 +41,11 @@ vec2 ballvel;
 
 double todeg(double rad)
 {
-  return rad/PI*180;
+  return (rad/PI)*180;
 }
 double torad(double deg)
 {
-  return 180*PI*deg;
+  return (PI*deg)/180;
 }
 
 void setBallSpeed(double speed, double direction)
@@ -81,14 +81,14 @@ int main(void)
 
   SDL_Rect balldata;
 
-  double ballspd = 2;
+  double ballspd = 10;
   double ballang = 45;
 
   balldata.w = 10;
   balldata.h = 10;
 
-  balldata.x = 0;
-  balldata.y = 0;
+  balldata.x = GetWindowSize(win1).x/2;
+  balldata.y = GetWindowSize(win1).y/2;
 
 
   SDL_Event event;
@@ -111,31 +111,31 @@ int main(void)
         running = false;
       }
     }
-    balldata.x += ballvel.x;
-    balldata.y += ballvel.y;
     if(balldata.x >= GetWindowSize(win1).x - balldata.w)
     {
-      ballvel.x = -abs(ballvel.x);
+      ballang = -abs(ballang);
       resetWalls(&walls.right);
     }
     if(balldata.x <= 0)
     {
-      ballvel.x = abs(ballvel.x);
+      ballang = abs(ballang);
       resetWalls(&walls.left);
     }
     if(balldata.y >= GetWindowSize(win1).y - balldata.h)
     {
-      ballvel.y = -abs(ballvel.y);
+      ballang = ballang < 180 && ballang > -180 ? ballang - 90 : ballang;
       resetWalls(&walls.top);
     }
     if(balldata.y <= 0)
     {
-      ballvel.y = abs(ballvel.y);
+      ballang = ballang < 180 && ballang > -180 ? ballang + 90 : ballang;
       resetWalls(&walls.bottom);
     }
     setBallSpeed(ballspd,ballang);
-    printf("B: s: %f  d: %f\r",getBallSpeed(),todeg(getBallDirection()));
-    SDL_Delay(3);
+    balldata.x = balldata.x + ballvel.x;
+    balldata.y = balldata.y + ballvel.y;
+    printf("B: s: %f  d: %f  vx: %f  vy: %f\r",ballspd,ballang,ballvel.x,ballvel.y);
+    SDL_Delay(1000/30);
   }
   end:
   SDL_DestroyTexture(ball);
