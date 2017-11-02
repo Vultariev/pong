@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
 #include "clamp.h"
@@ -82,7 +83,7 @@ int main(void)
 
   SDL_Rect balldata;
 
-  double ballspd = 7;
+  double ballspd = 6;
   double ballang = 45;
 
   balldata.w = 10;
@@ -101,9 +102,7 @@ int main(void)
   {
     SDL_PollEvent(&event);
 
-    SDL_RenderClear(ren);
-    SDL_RenderCopy(ren,ball,NULL,&balldata);
-    SDL_RenderPresent(ren);
+    SDL_RenderFillRect(ren,NULL);
 
     if(event.type != 0)
     {
@@ -115,29 +114,64 @@ int main(void)
     if(balldata.x >= GetWindowSize(win1).x - balldata.w)
     {
       ballang = -abs(ballang);
+      if(rand() / (double)RAND_MAX - 0.5 > 0)
+      {
+        ballang += (rand() / (double)RAND_MAX) * 10;
+      }
+      else
+      {
+        ballang -= (rand() / (double)RAND_MAX) * 10;
+      }
       resetWalls(&walls.right);
     }
     if(balldata.x <= 0)
     {
-      ballang = -abs(ballang);
+      ballang = abs(ballang);
+      if(rand() / (double)RAND_MAX - 0.5 > 0)
+      {
+        ballang += (rand() / (double)RAND_MAX) * 10;
+      }
+      else
+      {
+        ballang -= (rand() / (double)RAND_MAX) * 10;
+      }
       resetWalls(&walls.left);
     }
     if(balldata.y >= GetWindowSize(win1).y - balldata.h)
     {
       ballang = ballang < 90 && ballang > -90 ? 180 - ballang : ballang;
+      if(rand() / (double)RAND_MAX - 0.5 > 0)
+      {
+        ballang += (rand() / (double)RAND_MAX) * 10;
+      }
+      else
+      {
+        ballang -= (rand() / (double)RAND_MAX) * 10;
+      }
       resetWalls(&walls.bottom);
     }
     if(balldata.y <= 0)
     {
       ballang = ballang < 90 && ballang > -90 || 1 ? 180 - ballang: ballang;
+      if(rand() / (double)RAND_MAX - 0.5 > 0)
+      {
+        ballang += (rand() / (double)RAND_MAX) * 10;
+      }
+      else
+      {
+        ballang -= (rand() / (double)RAND_MAX) * 10;
+      }
       resetWalls(&walls.top);
     }
+
     ballang = clamp(ballang,-180,180);
     setBallSpeed(ballspd,ballang);
     balldata.x = balldata.x + ballvel.x;
     balldata.y = balldata.y + ballvel.y;
-    printf("B: s: %f  d: %f  vx: %f  vy: %f\r",ballspd,ballang,ballvel.x,ballvel.y);
-    SDL_Delay(1000/30);
+    SDL_RenderCopy(ren,ball,NULL,&balldata);
+    SDL_RenderPresent(ren);
+    printf("B: s: %f  d: %f  vx: %f  vy: %f\r rnd: %f",ballspd,ballang,ballvel.x,ballvel.y,rand() / (double)RAND_MAX);
+    SDL_Delay(1000/60);
   }
   printf("\n");
   end:
