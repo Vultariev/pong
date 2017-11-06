@@ -37,3 +37,5 @@ double todeg(double rad);
 double torad(double deg);
 
 void setBallSpeed(double speed, double direction);
+
+//void resetBall();

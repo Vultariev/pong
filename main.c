@@ -13,7 +13,7 @@ int main(void)
 
   SDL_Init(SDL_INIT_VIDEO);
 
-  SDL_Window* win1 = SDL_CreateWindow("Test",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,640,400,SDL_WINDOW_RESIZABLE);
+  SDL_Window* win1 = SDL_CreateWindow("Test",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,900,400,SDL_WINDOW_RESIZABLE);
 
   SDL_Renderer* ren = SDL_CreateRenderer(win1,-1,SDL_RENDERER_ACCELERATED);
 
@@ -30,8 +30,8 @@ int main(void)
   color uiColor = toColor(255, 255, 255, 255);
   color bColor = toColor(0,0,0,255);
 
-  paddlel.h = 10;
-  paddlel.w = 5;
+  paddler.h = 50;
+  paddler.w = 10;
 
   double ballspd = 6;
   double ballang = 45;
@@ -48,31 +48,54 @@ int main(void)
   ballvel.x = 1;
   ballvel.y = -1;
 
+  void resetBall()
+  {
+    balldata.x = GetWindowSize(win1).x/2;
+    balldata.y = GetWindowSize(win1).y/2;
+    double ballspd = 6;
+    double ballang = 45;
+  }
+
   while(running)
   {
-    SDL_PollEvent(&event);
     SetRenderDrawColor(ren,bColor);
     SDL_RenderFillRect(ren,NULL);
 
-    if(event.type != 0)
+    while(SDL_PollEvent(&event))
     {
-      if(event.type == SDL_QUIT)
+      if(event.type != 0)
       {
-        running = false;
+        if(event.type == SDL_QUIT)
+        {
+          running = false;
+        }
+      }
+      if(event.type == SDL_MOUSEMOTION)
+      {
+        paddler.y = event.motion.y - paddler.h/2;
       }
     }
-    if(balldata.x >= GetWindowSize(win1).x - balldata.w)
+    if(balldata.x >= paddler.x - balldata.w && balldata.x <= paddler.x + paddler.w)
     {
-      ballang = -abs(ballang);
-      if(rand() / (double)RAND_MAX - 0.5 > 0)
+      if(balldata.y - balldata.h < paddler.y + paddler.h && balldata.y > paddler.y)
       {
-        ballang += (rand() / (double)RAND_MAX) * 10;
+        ballspd += 1;
+        ballang = -abs(ballang);
+        if(rand() / (double)RAND_MAX - 0.5 > 0)
+        {
+          ballang += (rand() / (double)RAND_MAX) * 10;
+        }
+        else
+        {
+          ballang -= (rand() / (double)RAND_MAX) * 10;
+        }
+        resetWalls(&walls.right);
       }
-      else
-      {
-        ballang -= (rand() / (double)RAND_MAX) * 10;
-      }
-      resetWalls(&walls.right);
+    }
+    if(balldata.x + balldata.w >= GetWindowSize(win1).x)
+    {
+      //resetBall();
+      running = false;
     }
     if(balldata.x <= 0)
     {
@@ -118,7 +141,9 @@ int main(void)
     setBallSpeed(ballspd,ballang);
     balldata.x = balldata.x + ballvel.x;
     balldata.y = balldata.y + ballvel.y;
-    paddlel.x = 0.9*GetWindowSize(win1).x;
+    paddler.x = 0.9*GetWindowSize(win1).x;
+    SetRenderDrawColor(ren,uiColor);
+    SDL_RenderFillRect(ren,&paddler);
     SDL_RenderCopy(ren,ball,NULL,&balldata);
     SDL_RenderPresent(ren);
     printf("B: s: %f  d: %f  vx: %f  vy: %f\r rnd: %f",ballspd,ballang,ballvel.x,ballvel.y,rand() / (double)RAND_MAX);
