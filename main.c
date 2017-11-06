@@ -13,13 +13,31 @@ struct walls {
   bool right;
 } walls;
 
+struct color {
+  Uint8 r;
+  Uint8 g;
+  Uint8 b;
+  Uint8 a;
+};
+
+typedef struct color color;
+
+color toColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+{
+  color out;
+  out.r = r;
+  out.g = g;
+  out.b = b;
+  out.a = a;
+  return out;
+}
+
 struct vec2 {
   double x;
   double y;
 };
 
 typedef struct vec2 vec2;
-
 vec2 GetWindowSize(SDL_Window* window)
 {
   vec2 out;
@@ -28,6 +46,11 @@ vec2 GetWindowSize(SDL_Window* window)
   out.x = x;
   out.y = y;
   return out;
+}
+
+int SetRenderDrawColor(SDL_Renderer *renderer, color in)
+{
+  return SDL_SetRenderDrawColor(renderer, in.r, in.g, in.b, in.a);
 }
 
 void resetWalls(bool *wall)
@@ -82,6 +105,9 @@ int main(void)
   SDL_Texture* ball = SDL_CreateTextureFromSurface(ren,ballimg);
 
   SDL_Rect balldata;
+  SDL_Rect paddlel;
+  SDL_Rect paddler;
+  color uiColor = toColor(255, 255, 255, 255);
 
   double ballspd = 6;
   double ballang = 45;
@@ -174,7 +200,6 @@ int main(void)
     SDL_Delay(1000/60);
   }
   printf("\n");
-  end:
   SDL_DestroyTexture(ball);
   SDL_DestroyRenderer(ren);
   SDL_DestroyWindow(win1);
