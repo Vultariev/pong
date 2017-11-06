@@ -4,89 +4,8 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
 #include "clamp.h"
-#define PI 3.14159265358979
-struct walls {
-  //Values represent which wall the ball colided with last
-  bool top;
-  bool bottom;
-  bool left;
-  bool right;
-} walls;
+#include "frame.h"
 
-struct color {
-  Uint8 r;
-  Uint8 g;
-  Uint8 b;
-  Uint8 a;
-};
-
-typedef struct color color;
-
-color toColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
-{
-  color out;
-  out.r = r;
-  out.g = g;
-  out.b = b;
-  out.a = a;
-  return out;
-}
-
-struct vec2 {
-  double x;
-  double y;
-};
-
-typedef struct vec2 vec2;
-vec2 GetWindowSize(SDL_Window* window)
-{
-  vec2 out;
-  int x,y;
-  SDL_GetWindowSize(window,&x,&y);
-  out.x = x;
-  out.y = y;
-  return out;
-}
-
-int SetRenderDrawColor(SDL_Renderer *renderer, color in)
-{
-  return SDL_SetRenderDrawColor(renderer, in.r, in.g, in.b, in.a);
-}
-
-void resetWalls(bool *wall)
-{
-  walls.top = false;
-  walls.bottom = false;
-  walls.left = false;
-  walls.right = false;
-  *wall = true;
-}
-
-vec2 ballvel;
-
-double todeg(double rad)
-{
-  return (rad/PI)*180;
-}
-double torad(double deg)
-{
-  return (PI*deg)/180;
-}
-
-void setBallSpeed(double speed, double direction)
-{
-  ballvel.x = sin(torad(direction))*speed;
-  ballvel.y = cos(torad(direction))*speed;
-}
-
-/*double getBallDirection(void)
-{
-  return atan(ballvel.x/ballvel.y);
-}
-double getBallSpeed(void)
-{
-  return ballvel.x/sin(getBallDirection());
-}*/
 
 int main(void)
 {
@@ -107,7 +26,12 @@ int main(void)
   SDL_Rect balldata;
   SDL_Rect paddlel;
   SDL_Rect paddler;
+
   color uiColor = toColor(255, 255, 255, 255);
+  color bColor = toColor(0,0,0,255);
+
+  paddlel.h = 10;
+  paddlel.w = 5;
 
   double ballspd = 6;
   double ballang = 45;
@@ -127,7 +51,7 @@ int main(void)
   while(running)
   {
     SDL_PollEvent(&event);
-
+    SetRenderDrawColor(ren,bColor);
     SDL_RenderFillRect(ren,NULL);
 
     if(event.type != 0)
@@ -194,6 +118,7 @@ int main(void)
     setBallSpeed(ballspd,ballang);
     balldata.x = balldata.x + ballvel.x;
     balldata.y = balldata.y + ballvel.y;
+    paddlel.x = 0.9*GetWindowSize(win1).x;
     SDL_RenderCopy(ren,ball,NULL,&balldata);
     SDL_RenderPresent(ren);
     printf("B: s: %f  d: %f  vx: %f  vy: %f\r rnd: %f",ballspd,ballang,ballvel.x,ballvel.y,rand() / (double)RAND_MAX);
