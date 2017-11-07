@@ -31,9 +31,9 @@ int main(void)
   color bColor = toColor(0,0,0,255);
 
   paddler.h = 50;
-  paddler.w = 10;
+  paddler.w = 15;
 
-  double ballspd = 6;
+  double ballspd = 600;
   double ballang = 45;
 
   balldata.w = 10;
@@ -70,16 +70,16 @@ int main(void)
           running = false;
         }
       }
-      if(event.type == SDL_MOUSEMOTION)
+      /*if(event.type == SDL_MOUSEMOTION)
       {
         paddler.y = event.motion.y - paddler.h/2;
-      }
+      }*/
     }
     if(balldata.x >= paddler.x - balldata.w && balldata.x <= paddler.x + paddler.w)
     {
       if(balldata.y - balldata.h < paddler.y + paddler.h && balldata.y > paddler.y)
       {
-        ballspd += 1;
+        ballspd += 50;
         ballang = -abs(ballang);
         if(rand() / (double)RAND_MAX - 0.5 > 0)
         {
@@ -138,16 +138,17 @@ int main(void)
     }
 
     ballang = clamp(ballang,-180,180);
-    setBallSpeed(ballspd,ballang);
+    setBallSpeed(ballspd/120,ballang);
     balldata.x = balldata.x + ballvel.x;
     balldata.y = balldata.y + ballvel.y;
+    paddler.y = balldata.y - balldata.h/2 - paddler.h/2;
     paddler.x = 0.9*GetWindowSize(win1).x;
     SetRenderDrawColor(ren,uiColor);
     SDL_RenderFillRect(ren,&paddler);
     SDL_RenderCopy(ren,ball,NULL,&balldata);
     SDL_RenderPresent(ren);
     printf("B: s: %f  d: %f  vx: %f  vy: %f\r rnd: %f",ballspd,ballang,ballvel.x,ballvel.y,rand() / (double)RAND_MAX);
-    SDL_Delay(1000/60);
+    SDL_Delay(1000/120);
   }
   printf("\n");
   SDL_DestroyTexture(ball);
